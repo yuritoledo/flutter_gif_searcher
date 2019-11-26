@@ -57,10 +57,35 @@ class _HomeState extends State<Home> {
                 border: OutlineInputBorder(),
               ),
               style: TextStyle(color: Colors.white, fontSize: 18.0),
+            ),
+            Expanded(
+              child: FutureBuilder(
+                future: _getGifs(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) return Container();
+
+                    return _gifBuilder(context, snapshot);
+                  }
+                  return Container(
+                    width: 200,
+                    height: 200,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  );
+                },
+              ),
             )
           ],
         ),
       ),
     );
+  }
+
+  Widget _gifBuilder(BuildContext context, AsyncSnapshot snapshot) {
+    return Container();
   }
 }
