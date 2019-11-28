@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:gif_search/ui/gif.dart';
 import 'package:http/http.dart';
+import 'package:share/share.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -103,12 +105,19 @@ class _HomeState extends State<Home> {
           crossAxisCount: 2, crossAxisSpacing: 10.0, mainAxisSpacing: 10.0),
       itemBuilder: (context, index) {
         if (_search == null || index < list.length) {
+          final _imageUrl = list[index]['images']['fixed_height']['url'];
           return GestureDetector(
             child: Image.network(
-              list[index]['images']['fixed_height']['url'],
+              _imageUrl,
               height: 300.0,
               fit: BoxFit.cover,
             ),
+            onTap: () {
+              print(list[index]);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Gif(list[index])));
+            },
+            onLongPress: () => Share.share(_imageUrl),
           );
         } else {
           return GestureDetector(
