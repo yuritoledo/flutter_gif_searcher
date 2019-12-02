@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gif_search/ui/gif.dart';
 import 'package:http/http.dart';
 import 'package:share/share.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -24,7 +25,7 @@ class _HomeState extends State<Home> {
   _getGifs() async {
     String url;
 
-    if (_search == null) {
+    if (_search == null || _search.isEmpty) {
       final urlTrending =
           'https://api.giphy.com/v1/gifs/trending?api_key=wfCaDWTY5cyMHapDmXGpnXiKXWdLloKQ&limit=20&rating=G';
       url = urlTrending;
@@ -57,18 +58,7 @@ class _HomeState extends State<Home> {
         color: Colors.black,
         child: Column(
           children: <Widget>[
-            TextField(
-              onSubmitted: (text) => setState(() {
-                _search = text;
-                _offset = 0;
-              }),
-              decoration: InputDecoration(
-                labelText: 'Busque aqui',
-                labelStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(),
-              ),
-              style: TextStyle(color: Colors.white, fontSize: 18.0),
-            ),
+            _searchInput(),
             Expanded(
               child: FutureBuilder(
                 future: _getGifs(),
@@ -96,6 +86,26 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget _searchInput() {
+    return TextField(
+      onSubmitted: (text) => setState(() {
+        _search = text;
+        _offset = 0;
+      }),
+      decoration: InputDecoration(
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.cyan),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+        labelText: 'Busque aqui',
+        labelStyle: TextStyle(color: Colors.white),
+      ),
+      style: TextStyle(color: Colors.white, fontSize: 18.0),
+    );
+  }
+
   Widget _gifBuilder(BuildContext context, AsyncSnapshot snapshot) {
     final list = List.from(snapshot.data['data']);
     return GridView.builder(
@@ -107,8 +117,9 @@ class _HomeState extends State<Home> {
         if (_search == null || index < list.length) {
           final _imageUrl = list[index]['images']['fixed_height']['url'];
           return GestureDetector(
-            child: Image.network(
-              _imageUrl,
+            child: FadeInImage.memoryNetwork(
+              image: _imageUrl,
+              placeholder: kTransparentImage,
               height: 300.0,
               fit: BoxFit.cover,
             ),
